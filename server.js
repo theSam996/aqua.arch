@@ -8,35 +8,37 @@ const { createClient } = require('@supabase/supabase-js');
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: "http://127.0.0.1:3000",
+    origin: true,
     credentials: true
 }));
 app.use(express.static('.')); // Serve static files from root
 
-// Initialize Supabase (Backend Client)
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY);
+// Safe Supabase Initialization (prevents top-level crash on Vercel if env vars are missing)
+const supabaseUrl = process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'placeholder';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Initialize Razorpay
+// Safe Razorpay Initialization
 const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET
+    key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder',
+    key_secret: process.env.RAZORPAY_KEY_SECRET || 'placeholder_secret'
 });
 
 // Serve Public Config
 app.get('/api/config', (req, res) => {
     res.json({
         supabase: {
-            url: process.env.SUPABASE_URL,
-            key: process.env.SUPABASE_ANON_KEY
+            url: process.env.SUPABASE_URL || '',
+            key: process.env.SUPABASE_ANON_KEY || ''
         },
         firebase: {
-            apiKey: process.env.FIREBASE_API_KEY,
-            authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-            messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-            appId: process.env.FIREBASE_APP_ID,
-            measurementId: process.env.FIREBASE_MEASUREMENT_ID
+            apiKey: process.env.FIREBASE_API_KEY || '',
+            authDomain: process.env.FIREBASE_AUTH_DOMAIN || '',
+            projectId: process.env.FIREBASE_PROJECT_ID || '',
+            storageBucket: process.env.FIREBASE_STORAGE_BUCKET || '',
+            messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '',
+            appId: process.env.FIREBASE_APP_ID || '',
+            measurementId: process.env.FIREBASE_MEASUREMENT_ID || ''
         }
     });
 });
@@ -45,6 +47,10 @@ app.get('/api/config', (req, res) => {
 app.post('/api/create-order', async (req, res) => {
     try {
         const { amount, currency, product_name, user_id, shipping_address, shoe_size, activity_level, email, phone, full_name } = req.body;
+
+        if (!process.env.RAZORPAY_KEY_ID || !process.env.SUPABASE_URL) {
+            return res.status(500).json({ error: "Environment variables missing on server." });
+        }
 
         // Create Razorpay Order
         const options = {
@@ -96,7 +102,7 @@ app.post('/api/verify-payment', async (req, res) => {
         // Verify Signature
         const body = razorpay_order_id + "|" + razorpay_payment_id;
         const expectedSignature = crypto
-            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || 'placeholder_secret')
             .update(body.toString())
             .digest('hex');
 
@@ -134,6 +140,10 @@ app.post('/api/verify-payment', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+    });
+}
+
+module.exports = app;
