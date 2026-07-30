@@ -2,10 +2,21 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 
-// Initialize App
-export let auth;
-let resolveAuth;
-export const authInitialized = new Promise(resolve => resolveAuth = resolve);
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDUtnuKxH09RWpPcyHVtMsThEdbYusT8jM",
+  authDomain: "aquaarch-e9418.firebaseapp.com",
+  projectId: "aquaarch-e9418",
+  storageBucket: "aquaarch-e9418.firebasestorage.app",
+  messagingSenderId: "189063818908",
+  appId: "1:189063818908:web:d36d98702c813a88904759",
+  measurementId: "G-0870EJ5RGY"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+export const auth = getAuth(app);
 
 async function initializeAppResult() {
     try {
@@ -17,22 +28,6 @@ async function initializeAppResult() {
             window.supabase = window.supabase.createClient(config.supabase.url, config.supabase.key);
             console.log("Supabase initialized");
         }
-
-        // 2. Initialize Firebase
-        const firebaseConfig = {
-            apiKey: config.firebase.apiKey,
-            authDomain: config.firebase.authDomain,
-            projectId: config.firebase.projectId,
-            storageBucket: config.firebase.storageBucket,
-            messagingSenderId: config.firebase.messagingSenderId,
-            appId: config.firebase.appId,
-            measurementId: config.firebase.measurementId
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        auth = getAuth(app);
-        resolveAuth(auth); // Signal that auth is ready
 
         // Setup Auth Listeners after initialization
         setupAuthListeners();
@@ -529,7 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 "key": data.key_id,
                 "amount": data.amount,
                 "currency": data.currency,
-                "name": "AquaArch",
+                "name": "AquaSole",
                 "description": `Payment for ${storedProduct}`,
                 "order_id": data.order_id,
                 "handler": async function (response) {

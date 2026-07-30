@@ -1,6 +1,6 @@
-# AquaArch - Sustainable Insoles
+# AquaSole - Sustainable Insoles
 
-AquaArch is a web platform for 3D-printed sustainable insoles made from marine algae. This project allows users to explore products, perform 3D foot scans using their webcam, and manage their orders.
+AquaSole is a web platform for 3D-printed sustainable insoles made from marine algae. This project allows users to explore products, perform 3D foot scans using their webcam, and manage their orders.
 
 ## Features
 
@@ -22,7 +22,7 @@ AquaArch is a web platform for 3D-printed sustainable insoles made from marine a
 
 1.  **Clone the repository**:
     ```bash
-    git clone https://github.com/your-username/aquaarch.git
+    git clone https://github.com/your-username/aquasole.git
     ```
 2.  **Open the project**:
     -   Simply open `index.html` in your browser.
@@ -40,4 +40,4 @@ AquaArch is a web platform for 3D-printed sustainable insoles made from marine a
 
 ## License
 
-MIT License - Copyright (c) 2026 AquaArch
+MIT License - Copyright (c) 2026 AquaSole

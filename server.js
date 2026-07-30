@@ -14,7 +14,7 @@ app.use(cors({
 app.use(express.static('.')); // Serve static files from root
 
 // Initialize Supabase (Backend Client)
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY);
 
 // Initialize Razorpay
 const razorpay = new Razorpay({

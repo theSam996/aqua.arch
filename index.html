@@ -4,67 +4,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AquaArch - Sustainable Insoles</title>
+    <title>AquaSole - Sustainable Insoles from Ocean Algae</title>
+    <meta name="description" content="AquaSole crafts custom 3D-printed insoles from ocean-grown algae. Step into sustainable comfort, designed precisely from your foot scan.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="landing.css">
     <script type="module" src="script.js"></script>
-    <!-- Icons -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-<body>
+<body class="landing-body">
+
     <!-- Navbar -->
-    <nav class="navbar">
+    <nav class="navbar" id="navbar">
         <div class="container flex justify-between items-center h-full">
             <a href="index.html" class="brand">
-                Aqua<span class="accent-text">Arch</span>
+                Aqua<span class="accent-text">Sole</span>
             </a>
 
             <!-- Desktop Menu -->
             <div class="nav-links md-flex">
-                <a href="index.html#features">Features</a>
+                <a href="#features">Features</a>
                 <a href="foot_scan.html">Foot Scan</a>
-                <a href="index.html#about">About</a>
-                <a href="index.html#products">Products</a>
+                <a href="#about">About</a>
+                <a href="#products">Products</a>
             </div>
 
             <div class="nav-actions md-flex">
-                <!-- Guest Links -->
                 <div class="auth-link flex items-center gap-4">
                     <a href="login.html" class="nav-link">Log In</a>
                     <a href="signup.html" class="btn btn-primary small">Get Started</a>
                 </div>
-
-                <!-- User Links (Hidden by default) -->
                 <div class="user-link flex items-center gap-4" style="display: none;">
                     <a href="orders.html" class="text-sm font-medium" style="color:white; margin-right:15px;">Orders</a>
-                    <a href="dashboard.html" class="text-sm font-medium"
-                        style="color:white; margin-right:15px;">Dashboard</a>
+                    <a href="dashboard.html" class="text-sm font-medium" style="color:white; margin-right:15px;">Dashboard</a>
                     <button class="btn btn-outline small logout-btn">Log Out</button>
                 </div>
             </div>
 
             <!-- Mobile Toggle -->
             <div class="md-hidden">
-                <button class="mobile-toggle">
+                <button class="mobile-toggle" id="mobile-toggle-btn">
                     <i data-lucide="menu" color="white"></i>
                 </button>
             </div>
         </div>
 
         <!-- Mobile Menu -->
-        <div class="mobile-menu">
+        <div class="mobile-menu" id="mobile-menu">
             <div class="container flex flex-col gap-4">
-                <a href="index.html#features">Features</a>
-                <a href="index.html#about">About</a>
-                <a href="index.html#products">Products</a>
+                <a href="#features">Features</a>
+                <a href="#about">About</a>
+                <a href="#products">Products</a>
                 <hr style="border-color: rgba(255,255,255,0.1);" />
-
                 <div class="auth-link flex flex-col gap-2">
                     <a href="login.html">Log In</a>
                     <a href="signup.html" class="btn btn-primary w-full" style="color:black">Get Started</a>
                 </div>
-
                 <div class="user-link flex flex-col gap-2" style="display: none;">
                     <a href="dashboard.html">Dashboard</a>
                     <a href="orders.html">Orders</a>
@@ -75,26 +74,47 @@
     </nav>
 
     <main>
-        <!-- Hero Section -->
-        <section class="hero">
+        <!-- ==================== HERO SECTION ==================== -->
+        <section class="lp-hero" id="home">
+
             <div class="container">
-                <div class="hero-content reveal active">
-                    <div style="max-width: 800px;">
-                        <h1 class="hero-title">Aqua<span class="accent-text">Arch</span></h1>
-                        <h2 class="hero-subtitle">~Step into the comfort~</h2>
-                        <p class="hero-desc">
-                            Custom Insoles Designed From Your 3D Foot Scan. No Store Visit Needed.
+                <div class="lp-hero-content">
+                    <!-- Left: Text -->
+                    <div class="lp-hero-text" data-scroll="fade-up">
+                        <div class="lp-hero-badge">
+                            <span class="badge-dot"></span>
+                            Eco-Positive · 3D Custom
+                        </div>
+                        <h1 class="lp-hero-title">
+                            Step into<br>
+                            <span class="gradient-text">Living Water.</span>
+                        </h1>
+                        <p class="lp-hero-desc">
+                            Custom insoles crafted from ocean algae, shaped precisely to your foot with 3D scanning technology.
                         </p>
-                        <div class="flex justify-center gap-4">
-                            <a href="signup.html" class="btn btn-primary">
-                                Get Started <i data-lucide="arrow-right" style="margin-left: 8px; width: 18px;"></i>
+                        <div class="lp-hero-cta">
+                            <a href="signup.html" class="btn btn-primary lp-btn-glow" id="hero-cta-btn">
+                                Start Your Journey
+                                <i data-lucide="arrow-right" style="margin-left: 8px; width: 18px;"></i>
+                            </a>
+                            <a href="#about" class="btn btn-outline lp-btn-ghost">
+                                Explore More
+                                <i data-lucide="chevron-down" style="margin-left: 8px; width: 16px;"></i>
                             </a>
                         </div>
+
                     </div>
 
-                    <div class="hero-image-placeholder reveal" style="transition-delay: 0.3s;">
-                        <img src="assets/app_prototype_mockup.png" alt="App Prototype"
-                            style="width: 100%; height: 100%; object-fit: contain;">
+                    <!-- Right: Product image with TiltedCard 3D Effect -->
+                    <div class="lp-hero-visual" data-scroll="fade-left">
+                        <div class="tilted-card-figure" id="tilted-card">
+                            <div class="tilted-card-inner">
+                                <img src="assets/insole_product.png" alt="AquaSole 3D Custom Insole" class="lp-hero-product-img tilted-card-img">
+                                <div class="tilted-card-overlay">
+                                    <span class="tilted-card-badge">AquaSole · 3D Fit</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -102,254 +122,584 @@
 
 
 
-        <!-- About Section -->
-        <section id="about" class="section-padding">
-            <div class="container reveal">
-                <div class="flex flex-col items-center text-center">
-                    <h2 class="section-title">What is Aqua<span class="accent-text">Arch</span>?</h2>
-                    <p class="text-lg" style="max-width: 800px;">
-                        Sustainable insoles made from ocean-grown algae, offering comfort, support, and breathability.
-                        The process involves responsibly collecting algae, drying it, and blending it with biodegradable
-                        polymers. These insoles are lightweight, odor-resistant, and customizable. Prevent foot pain,
-                        improve posture, and get perfectly fitted insoles delivered to your door.
-                    </p>
+        <!-- ==================== ABOUT SECTION ==================== -->
+        <section id="about" class="lp-section">
+            <div class="container">
+                <div class="lp-about-grid">
+                    <!-- Left: Visual -->
+                    <div class="lp-about-visual" data-scroll="fade-right">
+                        <div class="lp-about-img-card">
+                            <img src="assets/insole_product.png" alt="AquaSole Insole" class="lp-about-img">
+                            <div class="lp-about-img-tag">Made from Ocean Algae</div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Text -->
+                    <div class="lp-about-text" data-scroll="fade-left">
+                        <div class="lp-section-label">ABOUT AQUASOLE</div>
+                        <h2 class="lp-section-title">Where <span class="gradient-text">Ocean</span> Meets <span class="gradient-text-alt">Green</span></h2>
+                        <p>AquaSole turns excess ocean algae blooms into high-performance, sustainable insoles. Soft, breathable, and odor-resistant — crafted to support your feet and restore marine ecosystems.</p>
+                        <div class="lp-about-badges">
+                            <div class="lp-badge"><i data-lucide="leaf" style="width:16px; color: #4ADE80;"></i> Algae-Based</div>
+                            <div class="lp-badge"><i data-lucide="droplets" style="width:16px; color: #38BDF8;"></i> Water-Positive</div>
+                            <div class="lp-badge"><i data-lucide="recycle" style="width:16px; color: #A3E635;"></i> Zero Waste</div>
+                            <div class="lp-badge"><i data-lucide="heart" style="width:16px; color: #F472B6;"></i> Comfort First</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Products Section -->
-        <section id="products" class="section-padding bg-secondary">
-            <div class="container reveal">
-                <h4 class="text-center"
-                    style="text-transform:uppercase; letter-spacing:0.1em; color:var(--text-secondary)">Prototype</h4>
-                <h2 class="section-title text-center mb-12">Base <span class="accent-text">Products</span></h2>
+        <!-- ==================== FEATURES SECTION ==================== -->
+        <section id="features" class="lp-section lp-section-dark">
+            <div class="container">
+                <div class="lp-section-header text-center" data-scroll="fade-up">
+                    <div class="lp-section-label">Why AquaSole</div>
+                    <h2 class="lp-section-title">Built Different.<br><span class="gradient-text">Grown Different.</span></h2>
+                </div>
 
-                <div class="products-grid">
+                <div class="lp-classic-grid" data-scroll="fade-up">
+                    <!-- Feature 1 -->
+                    <div class="lp-classic-card">
+                        <div class="lp-classic-card-header">
+                            <span class="lp-classic-num">01</span>
+                            <div class="lp-classic-icon">
+                                <i data-lucide="scan"></i>
+                            </div>
+                        </div>
+                        <h3>3D Foot Scanning</h3>
+                        <p>Capture a precise 3D model of your foot using your smartphone. Zero store visits, guaranteed perfect custom fit.</p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="lp-classic-card">
+                        <div class="lp-classic-card-header">
+                            <span class="lp-classic-num">02</span>
+                            <div class="lp-classic-icon">
+                                <i data-lucide="leaf"></i>
+                            </div>
+                        </div>
+                        <h3>Algae Biopolymer</h3>
+                        <p>Engineered from marine algae into a lightweight, breathable, and odor-fighting biodegradable foam matrix.</p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="lp-classic-card">
+                        <div class="lp-classic-card-header">
+                            <span class="lp-classic-num">03</span>
+                            <div class="lp-classic-icon">
+                                <i data-lucide="droplets"></i>
+                            </div>
+                        </div>
+                        <h3>Ocean-Positive Impact</h3>
+                        <p>Every pair cleans excess algae from polluted waterways, combating toxic blooms and revitalizing marine habitats.</p>
+                    </div>
+
+                    <!-- Feature 4 -->
+                    <div class="lp-classic-card">
+                        <div class="lp-classic-card-header">
+                            <span class="lp-classic-num">04</span>
+                            <div class="lp-classic-icon">
+                                <i data-lucide="zap"></i>
+                            </div>
+                        </div>
+                        <h3>48-Hour Delivery</h3>
+                        <p>Custom-manufactured on demand and delivered directly to your doorstep in under 48 hours.</p>
+                    </div>
+
+                    <!-- Feature 5 -->
+                    <div class="lp-classic-card">
+                        <div class="lp-classic-card-header">
+                            <span class="lp-classic-num">05</span>
+                            <div class="lp-classic-icon">
+                                <i data-lucide="shield-check"></i>
+                            </div>
+                        </div>
+                        <h3>Clinically Tested</h3>
+                        <p>Podiatrist-approved for plantar fasciitis, arch support, and high-impact athletic performance.</p>
+                    </div>
+
+                    <!-- Feature 6 -->
+                    <div class="lp-classic-card">
+                        <div class="lp-classic-card-header">
+                            <span class="lp-classic-num">06</span>
+                            <div class="lp-classic-icon">
+                                <i data-lucide="refresh-cw"></i>
+                            </div>
+                        </div>
+                        <h3>Circular & Recyclable</h3>
+                        <p>Return your worn insoles anytime. We re-process them into new products with zero landfill waste.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PRODUCTS SECTION ==================== -->
+        <section id="products" class="lp-section">
+            <div class="container">
+                <div class="lp-section-header text-center" data-scroll="fade-up">
+                    <div class="lp-section-label">Prototype Collection</div>
+                    <h2 class="lp-section-title">Choose Your <span class="gradient-text">Sole</span></h2>
+                </div>
+
+                <div class="lp-products-grid" data-scroll="fade-up">
                     <!-- Product 1 -->
-                    <div class="product-card">
-                        <img src="assets/insole_product.png" alt="EcoSupport" class="product-img">
-                        <h3 class="product-name">EcoSupport</h3>
-                        <p class="product-desc">Made with Polylactic Acid (PLA)</p>
-                        <div class="product-actions">
-                            <button class="btn btn-outline small" onclick="addToCart('EcoSupport', '₹799')">
-                                <i data-lucide="shopping-cart" style="width:16px; margin-right:5px;"></i> Add to Cart
-                            </button>
-                            <button class="btn btn-primary small" onclick="buyProduct('EcoSupport', '₹799')">Buy
-                                Now</button>
+                    <div class="lp-product-card">
+                        <div class="lp-product-glow-bg lp-glow-cyan"></div>
+                        <div class="lp-product-badge">Most Popular</div>
+                        <div class="lp-product-img-wrap">
+                            <img src="assets/insole_product.png" alt="EcoSupport" class="lp-product-img-big">
+                            <div class="lp-product-ripple"></div>
+                        </div>
+                        <div class="lp-product-info">
+                            <h3 class="lp-product-name">EcoSupport</h3>
+                            <p class="lp-product-material">Polylactic Acid (PLA)</p>
+                            <p class="lp-product-bio">Best for everyday comfort and general foot support. Lightweight and flexible.</p>
+                            <div class="lp-product-price">₹799</div>
+                            <div class="lp-product-btns">
+                                <button class="btn btn-outline small" onclick="addToCart('EcoSupport', '₹799')">
+                                    <i data-lucide="shopping-cart" style="width:16px; margin-right:5px;"></i> Cart
+                                </button>
+                                <button class="btn btn-primary small" onclick="buyProduct('EcoSupport', '₹799')">Buy Now</button>
+                            </div>
                         </div>
                     </div>
+
                     <!-- Product 2 -->
-                    <div class="product-card">
-                        <img src="assets/insole_product.png" alt="EcoDomes" class="product-img"
-                            style="filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5)) hue-rotate(40deg)">
-                        <h3 class="product-name">EcoDomes</h3>
-                        <p class="product-desc">Made with Polyhydroxybutyrate (PHB)</p>
-                        <div class="product-actions">
-                            <button class="btn btn-outline small" onclick="addToCart('EcoDomes', '₹1,199')">
-                                <i data-lucide="shopping-cart" style="width:16px; margin-right:5px;"></i> Add to Cart
-                            </button>
-                            <button class="btn btn-primary small" onclick="buyProduct('EcoDomes', '₹1,199')">Buy
-                                Now</button>
+                    <div class="lp-product-card lp-product-featured">
+                        <div class="lp-product-glow-bg lp-glow-green"></div>
+                        <div class="lp-product-badge lp-badge-premium">Premium</div>
+                        <div class="lp-product-img-wrap">
+                            <img src="assets/insole_product.png" alt="EcoDomes" class="lp-product-img-big" style="filter: drop-shadow(0 20px 40px rgba(74,222,128,0.5)) hue-rotate(40deg)">
+                            <div class="lp-product-ripple lp-ripple-green"></div>
+                        </div>
+                        <div class="lp-product-info">
+                            <h3 class="lp-product-name">EcoDomes</h3>
+                            <p class="lp-product-material">Polyhydroxybutyrate (PHB)</p>
+                            <p class="lp-product-bio">Enhanced arch support and moisture control for active lifestyles.</p>
+                            <div class="lp-product-price">₹1,199</div>
+                            <div class="lp-product-btns">
+                                <button class="btn btn-outline small" onclick="addToCart('EcoDomes', '₹1,199')">
+                                    <i data-lucide="shopping-cart" style="width:16px; margin-right:5px;"></i> Cart
+                                </button>
+                                <button class="btn btn-primary small" onclick="buyProduct('EcoDomes', '₹1,199')">Buy Now</button>
+                            </div>
                         </div>
                     </div>
+
                     <!-- Product 3 -->
-                    <div class="product-card">
-                        <img src="assets/insole_product.png" alt="EcoStrides" class="product-img"
-                            style="filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5)) hue-rotate(80deg)">
-                        <h3 class="product-name">EcoStrides</h3>
-                        <p class="product-desc">Made with Polyhydroxyalkanoates (PHA)</p>
-                        <div class="product-actions">
-                            <button class="btn btn-outline small" onclick="addToCart('EcoStrides', '₹2,099')">
-                                <i data-lucide="shopping-cart" style="width:16px; margin-right:5px;"></i> Add to Cart
-                            </button>
-                            <button class="btn btn-primary small" onclick="buyProduct('EcoStrides', '₹2,099')">Buy
-                                Now</button>
+                    <div class="lp-product-card">
+                        <div class="lp-product-glow-bg lp-glow-teal"></div>
+                        <div class="lp-product-img-wrap">
+                            <img src="assets/insole_product.png" alt="EcoStrides" class="lp-product-img-big" style="filter: drop-shadow(0 20px 40px rgba(56,189,248,0.4)) hue-rotate(80deg)">
+                            <div class="lp-product-ripple lp-ripple-teal"></div>
+                        </div>
+                        <div class="lp-product-info">
+                            <h3 class="lp-product-name">EcoStrides</h3>
+                            <p class="lp-product-material">Polyhydroxyalkanoates (PHA)</p>
+                            <p class="lp-product-bio">Max-performance insole for athletes and high-impact activities. Superior energy return.</p>
+                            <div class="lp-product-price">₹2,099</div>
+                            <div class="lp-product-btns">
+                                <button class="btn btn-outline small" onclick="addToCart('EcoStrides', '₹2,099')">
+                                    <i data-lucide="shopping-cart" style="width:16px; margin-right:5px;"></i> Cart
+                                </button>
+                                <button class="btn btn-primary small" onclick="buyProduct('EcoStrides', '₹2,099')">Buy Now</button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Price Ladder -->
-                <div class="price-ladder-section reveal" style="margin-top: 5rem;">
-                    <h2 class="section-title text-center">Price <span class="accent-text">Ladder</span></h2>
-                    <div class="price-ladder-container">
-                        <div class="ladder-line"></div>
-                        <div class="ladder-points">
-                            <div class="ladder-step">
-                                <div class="ladder-price">₹799</div>
-                                <div class="ladder-dot-wrapper">
-                                    <div class="ladder-dot"></div>
-                                </div>
-                            </div>
-                            <div class="ladder-step">
-                                <div class="ladder-price">₹1,199</div>
-                                <div class="ladder-dot-wrapper">
-                                    <div class="ladder-dot"></div>
-                                </div>
-                            </div>
-                            <div class="ladder-step">
-                                <div class="ladder-price">₹2,099</div>
-                                <div class="ladder-dot-wrapper">
-                                    <div class="ladder-dot"></div>
-                                </div>
-                            </div>
+                <div class="lp-price-ladder" data-scroll="fade-up">
+                    <div class="lp-price-label">Base Price Ladder</div>
+                    <div class="lp-price-track">
+                        <div class="lp-price-node">
+                            <div class="lp-price-bubble">₹799</div>
+                            <div class="lp-price-dot"></div>
+                            <div class="lp-price-name">EcoSupport</div>
                         </div>
-                        <p class="extra-charge-text">*Extra ₹99 charged above base price for 3D customised insoles*
-
-                        </p>
+                        <div class="lp-price-line"></div>
+                        <div class="lp-price-node">
+                            <div class="lp-price-bubble lp-bubble-mid">₹1,199</div>
+                            <div class="lp-price-dot lp-dot-mid"></div>
+                            <div class="lp-price-name">EcoDomes</div>
+                        </div>
+                        <div class="lp-price-line"></div>
+                        <div class="lp-price-node">
+                            <div class="lp-price-bubble lp-bubble-top">₹2,099</div>
+                            <div class="lp-price-dot lp-dot-top"></div>
+                            <div class="lp-price-name">EcoStrides</div>
+                        </div>
                     </div>
+                    <p class="lp-price-note">*+₹99 for 3D customised insoles</p>
                 </div>
             </div>
         </section>
 
-        <!-- Features Cards -->
-        <section id="features" class="section-padding">
-            <div class="container reveal">
-                <div class="feature-grid">
-                    <div class="glass-card feature-card">
-                        <i data-lucide="smartphone" class="feature-icon"></i>
-                        <h3>3D Scanning</h3>
-                        <p>Customised insole allowing for maximum comfort which fits your foot perfectly due to the 3D
-                            scanning technology.</p>
-                    </div>
-                    <div class="glass-card feature-card">
-                        <i data-lucide="wind" class="feature-icon"></i>
-                        <h3>Insole Creation</h3>
-                        <p>Eco-Positive Impact: Beyond providing comfort, the brand emphasizes its eco-positive impact
-                            by harnessing algae.</p>
-                    </div>
-                    <div class="glass-card feature-card">
-                        <i data-lucide="leaf" class="feature-icon"></i>
-                        <h3>Algae Recycling</h3>
-                        <p>Sustainable Comfort: The core feature of the insole brand is its commitment to
-                            sustainability.</p>
-                    </div>
+        <!-- ==================== HOW IT WORKS ==================== -->
+        <section id="how-it-works" class="lp-section lp-section-dark">
+            <div class="container">
+                <div class="lp-section-header text-center" data-scroll="fade-up">
+                    <div class="lp-section-label">THE PROCESS</div>
+                    <h2 class="lp-section-title">From <span class="accent-text">Ocean</span> to Your Feet</h2>
                 </div>
-            </div>
-        </section>
 
-        <!-- How It Works Section -->
-        <section id="how-it-works" class="section-padding bg-secondary">
-            <div class="container reveal">
-                <h2 class="section-title text-center mb-12">How It <span class="accent-text">Works</span></h2>
-
-                <div class="flex flex-col gap-6" style="max-width: 800px; margin: 0 auto;">
-
+                <div class="lp-process-grid" data-scroll="fade-up">
                     <!-- Step 1 -->
-                    <div class="process-step">
-                        <div class="process-number">1</div>
-                        <div>
-                            <h3 style="margin-bottom: 0.5rem; color: white;">Scan Your Foot</h3>
-                            <p style="color: var(--text-secondary);">Scan your foot using your smartphone to capture
-                                precise 3D measurements.</p>
+                    <div class="lp-process-card">
+                        <span class="lp-process-step-num">01</span>
+                        <div class="lp-process-icon-wrap">
+                            <i data-lucide="scan-face" class="lp-process-icon"></i>
                         </div>
+                        <h3>Scan Your Foot</h3>
+                        <p>Use your smartphone camera in our 3D Foot Scan to capture your exact dimensions from all angles.</p>
+                    </div>
+
+                    <div class="lp-process-arrow">
+                        <i data-lucide="arrow-right" class="lp-arrow-icon"></i>
                     </div>
 
                     <!-- Step 2 -->
-                    <div class="process-step">
-                        <div class="process-number">2</div>
-                        <div>
-                            <h3 style="margin-bottom: 0.5rem; color: white;">Customize Your Insole</h3>
-                            <p style="color: var(--text-secondary);">Choose the insole type designed for your comfort,
-                                activity, and support needs.</p>
+                    <div class="lp-process-card">
+                        <span class="lp-process-step-num">02</span>
+                        <div class="lp-process-icon-wrap">
+                            <i data-lucide="sliders" class="lp-process-icon"></i>
                         </div>
+                        <h3>Choose Your Insole</h3>
+                        <p>Select the material that matches your lifestyle — casual, active, or therapeutic.</p>
+                    </div>
+
+                    <div class="lp-process-arrow">
+                        <i data-lucide="arrow-right" class="lp-arrow-icon"></i>
                     </div>
 
                     <!-- Step 3 -->
-                    <div class="process-step">
-                        <div class="process-number">3</div>
-                        <div>
-                            <h3 style="margin-bottom: 0.5rem; color: white;">Crafted from Ocean-Grown Algae</h3>
-                            <p style="color: var(--text-secondary);">Sustainable algae is processed into a soft,
-                                durable, eco-friendly material.</p>
+                    <div class="lp-process-card">
+                        <span class="lp-process-step-num">03</span>
+                        <div class="lp-process-icon-wrap">
+                            <i data-lucide="waves" class="lp-process-icon"></i>
                         </div>
+                        <h3>Algae Gets Harvested</h3>
+                        <p>We collect ocean algae and process it into our eco biopolymer, removing pollution as we create.</p>
+                    </div>
+
+                    <div class="lp-process-arrow">
+                        <i data-lucide="arrow-right" class="lp-arrow-icon"></i>
                     </div>
 
                     <!-- Step 4 -->
-                    <div class="process-step">
-                        <div class="process-number">4</div>
-                        <div>
-                            <h3 style="margin-bottom: 0.5rem; color: white;">Precision Manufacturing & Testing</h3>
-                            <p style="color: var(--text-secondary);">Each insole is carefully manufactured and tested
-                                for long-lasting comfort.</p>
+                    <div class="lp-process-card">
+                        <span class="lp-process-step-num">04</span>
+                        <div class="lp-process-icon-wrap">
+                            <i data-lucide="package-check" class="lp-process-icon"></i>
                         </div>
+                        <h3>Delivered in 48h</h3>
+                        <p>3D-printed to your exact shape and delivered. Every step supports ocean health.</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 3.5rem; text-align: center;">
+                    <a href="foot_scan.html" class="btn btn-primary lp-btn-glow" style="padding: 0.85rem 2.25rem; font-size: 1rem; border-radius: 999px;">Start Your Scan →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== IMPACT COUNTER ==================== -->
+        <section class="lp-impact-section" data-scroll="fade-up">
+            <div class="lp-impact-waves">
+                <svg viewBox="0 0 1440 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                    <path fill="rgba(0,180,120,0.15)" d="M0,40 C360,100 1080,0 1440,60 L1440,100 L0,100 Z"></path>
+                </svg>
+            </div>
+            <div class="container">
+                <h2 class="lp-section-title text-center" style="margin-bottom:3rem">Our <span class="gradient-text">Impact</span> So Far</h2>
+                <div class="lp-impact-grid">
+                    <div class="lp-impact-card">
+                        <div class="lp-impact-icon-wrap">
+                            <i data-lucide="waves" class="lp-impact-icon"></i>
+                        </div>
+                        <div class="lp-impact-num-group">
+                            <span class="lp-impact-num" data-count="2400">0</span>
+                            <span class="lp-impact-unit">kg</span>
+                        </div>
+                        <div class="lp-impact-label">Algae Removed from Oceans</div>
                     </div>
 
-                    <!-- Step 5 -->
-                    <div class="process-step">
-                        <div class="process-number">5</div>
-                        <div>
-                            <h3 style="margin-bottom: 0.5rem; color: white;">Walk Comfortably. Give Back to the Ocean.
-                            </h3>
-                            <p style="color: var(--text-secondary);">Enjoy personalized comfort while helping reduce
-                                ocean pollution.</p>
+                    <div class="lp-impact-card">
+                        <div class="lp-impact-icon-wrap">
+                            <i data-lucide="leaf" class="lp-impact-icon"></i>
                         </div>
+                        <div class="lp-impact-num-group">
+                            <span class="lp-impact-num" data-count="3000">0</span>
+                            <span class="lp-impact-unit">+</span>
+                        </div>
+                        <div class="lp-impact-label">Insoles Delivered</div>
                     </div>
 
-                    <div style="margin-top: 2rem; text-align: center;">
-                        <a href="foot_scan.html" class="btn btn-primary">Start Your Scan</a>
+                    <div class="lp-impact-card">
+                        <div class="lp-impact-icon-wrap">
+                            <i data-lucide="factory" class="lp-impact-icon"></i>
+                        </div>
+                        <div class="lp-impact-num-group">
+                            <span class="lp-impact-num" data-count="0">0</span>
+                            <span class="lp-impact-unit">kg</span>
+                        </div>
+                        <div class="lp-impact-label">CO₂ Landfill Waste</div>
+                    </div>
+
+                    <div class="lp-impact-card">
+                        <div class="lp-impact-icon-wrap">
+                            <i data-lucide="droplets" class="lp-impact-icon"></i>
+                        </div>
+                        <div class="lp-impact-num-group">
+                            <span class="lp-impact-num" data-count="98">0</span>
+                            <span class="lp-impact-unit">%</span>
+                        </div>
+                        <div class="lp-impact-label">Customer Satisfaction</div>
                     </div>
                 </div>
             </div>
         </section>
-        <!-- Founders Section (Moved) -->
-        <section id="founders" class="section-padding bg-secondary" style="border-top: 1px solid var(--glass-border);">
-            <div class="container reveal">
-                <h2 class="section-title text-center">Meet the <span class="accent-text">Founders</span></h2>
-                <div class="founders-grid">
-                    <div class="founder-card">
-                        <div class="founder-img-wrapper">
-                            <img src="assets/samar_kumar.jpg" alt="Samar Kumar"
-                                style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <h3 class="founder-name">Samar Kumar</h3>
-                        <p class="founder-role">Full Stack Developer & Business Analyst</p>
-                        <a href="mailto:samargoyal367@gmail.com" class="text-xs text-muted"
-                            style="color: var(--text-secondary); margin-top: 0.5rem; display: block;">samargoyal367@gmail.com</a>
+
+        <!-- ==================== FOUNDER SECTION ==================== -->
+        <section id="founders" class="lp-section">
+            <div class="container">
+                <div class="lp-section-header text-center" data-scroll="fade-up">
+                    <div class="lp-section-label">The Team</div>
+                    <h2 class="lp-section-title">Meet the <span class="gradient-text">Founder</span></h2>
+                </div>
+                <div class="lp-founder-card" data-scroll="fade-up">
+                    <div class="lp-founder-img-wrap">
+                        <div class="lp-founder-ring"></div>
+                        <img src="assets/samar_kumar.jpg" alt="Samar Kumar" class="lp-founder-img">
+                    </div>
+                    <div class="lp-founder-info">
+                        <h3 class="lp-founder-name">Samar Kumar</h3>
+                        <p class="lp-founder-role">Founder & Full Stack Developer</p>
+                        <p class="lp-founder-bio">Samar built AquaSole from the ground up — combining a love for marine ecology, sustainable materials science, and cutting-edge web tech to create an insole that doesn't just feel good, but does good.</p>
+                        <a href="mailto:samarkumar@arcesports.app" class="lp-founder-email">
+                            <i data-lucide="mail" style="width:16px;"></i>
+                            samarkumar@arcesports.app
+                        </a>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer style="padding: 4rem 0; border-top: 1px solid var(--glass-border); background: var(--bg-secondary);">
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="lp-footer">
+        <div class="lp-footer-wave">
+            <svg viewBox="0 0 1440 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path fill="#050806" d="M0,60 C480,100 960,20 1440,70 L1440,100 L0,100 Z"></path>
+            </svg>
+        </div>
         <div class="container">
-            <div class="flex flex-col md-flex-row justify-between items-start gap-8" style="width: 100%;">
-
-                <!-- Left: Brand -->
-                <div style="flex: 1; text-align: left;">
-                    <a href="index.html" style="font-size: 1.5rem; font-weight: bold;">
-                        Aqua<span class="accent-text">Arch</span>
+            <div class="lp-footer-grid">
+                <div class="lp-footer-brand">
+                    <a href="index.html" style="font-size: 2rem; font-weight: 800; letter-spacing: -1px;">
+                        Aqua<span style="color: var(--accent-primary);">Sole</span>
                     </a>
-                    <p style="margin-top: 0.5rem; max-width: 300px;">
-                        Sustainable steps towards a healthier planet.
-                    </p>
+                    <p>Sustainable steps towards a healthier planet. Wear the ocean.</p>
+                    <div class="lp-footer-socials">
+                        <a href="#" class="lp-social-btn"><i data-lucide="twitter" style="width:18px;"></i></a>
+                        <a href="#" class="lp-social-btn"><i data-lucide="instagram" style="width:18px;"></i></a>
+                        <a href="#" class="lp-social-btn"><i data-lucide="linkedin" style="width:18px;"></i></a>
+                    </div>
                 </div>
-
-                <!-- Middle: Product -->
-                <div class="flex flex-col gap-2" style="flex: 1; align-items: center; text-align: center;">
-                    <h4 style="font-size: 0.9rem; color: white;">Product</h4>
-                    <a href="#features" style="font-size: 0.9rem; color: var(--text-secondary);">Features</a>
-                    <a href="#how-it-works" style="font-size: 0.9rem; color: var(--text-secondary);">How it Works</a>
+                <div class="lp-footer-col">
+                    <h4>Product</h4>
+                    <a href="#features">Features</a>
+                    <a href="#how-it-works">How it Works</a>
+                    <a href="#products">Products</a>
+                    <a href="foot_scan.html">Foot Scan</a>
                 </div>
-
-                <!-- Right: Company -->
-                <div class="flex flex-col gap-2" style="flex: 1; align-items: flex-end; text-align: right;">
-                    <h4 style="font-size: 0.9rem; color: white;">Company</h4>
-                    <a href="#about" style="font-size: 0.9rem; color: var(--text-secondary);">About</a>
-                    <a href="#founders" style="font-size: 0.9rem; color: var(--text-secondary);">Contact</a>
+                <div class="lp-footer-col">
+                    <h4>Company</h4>
+                    <a href="#about">About</a>
+                    <a href="#founders">Contact</a>
+                    <a href="login.html">Log In</a>
+                    <a href="signup.html">Sign Up</a>
+                </div>
+                <div class="lp-footer-col">
+                    <h4>Mission</h4>
+                    <a href="#about">Ocean Health</a>
+                    <a href="#about">Sustainability</a>
+                    <a href="#about">Zero Waste</a>
+                    <a href="#about">Biodegradable</a>
                 </div>
             </div>
-
-            <div
-                style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--glass-border); text-align: center; font-size: 0.85rem; color: var(--text-muted);">
-                &copy; 2026 AquaArch. All rights reserved.
+            <div class="lp-footer-bottom">
+                &copy; 2026 AquaSole. All rights reserved. Made with 💧 for the ocean.
             </div>
         </div>
     </footer>
+
     <script>
-        // Initialize Lucide icons
         lucide.createIcons();
+
+        // ---- Scroll Animations ----
+        const scrollEls = document.querySelectorAll('[data-scroll]');
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('scroll-visible');
+                    io.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        scrollEls.forEach(el => io.observe(el));
+
+        // ---- Counter Animation ----
+        function animateCounter(el) {
+            const target = +el.dataset.count;
+            const duration = 2000;
+            const start = performance.now();
+            function update(now) {
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                el.textContent = Math.floor(eased * target).toLocaleString();
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    animateCounter(e.target);
+                    counterObserver.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+
+        // ---- Navbar scroll effect ----
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            nav.classList.toggle('navbar-scrolled', window.scrollY > 60);
+        });
+
+        // ---- Mobile toggle ----
+        document.getElementById('mobile-toggle-btn').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('open');
+        });
+
+        // ---- ClickSpark Effect ----
+        (function initClickSpark() {
+            const canvas = document.createElement('canvas');
+            canvas.id = 'click-spark-canvas';
+            canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;';
+            document.body.appendChild(canvas);
+
+            const ctx = canvas.getContext('2d');
+            let W = canvas.width = window.innerWidth;
+            let H = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                W = canvas.width = window.innerWidth;
+                H = canvas.height = window.innerHeight;
+            });
+
+            const sparks = [];
+            const sparkColor = '#00c88c';
+            const sparkSize = 10;
+            const sparkRadius = 18;
+            const sparkCount = 8;
+            const duration = 400;
+
+            function easeOut(t) {
+                return t * (2 - t);
+            }
+
+            let animId = null;
+            function animate(now) {
+                ctx.clearRect(0, 0, W, H);
+                const aliveSparks = [];
+
+                for (let i = 0; i < sparks.length; i++) {
+                    const spark = sparks[i];
+                    const elapsed = now - spark.startTime;
+                    if (elapsed < duration) {
+                        const progress = elapsed / duration;
+                        const eased = easeOut(progress);
+                        const distance = eased * sparkRadius;
+                        const lineLength = sparkSize * (1 - eased);
+
+                        const x1 = spark.x + distance * Math.cos(spark.angle);
+                        const y1 = spark.y + distance * Math.sin(spark.angle);
+                        const x2 = spark.x + (distance + lineLength) * Math.cos(spark.angle);
+                        const y2 = spark.y + (distance + lineLength) * Math.sin(spark.angle);
+
+                        ctx.strokeStyle = sparkColor;
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(x1, y1);
+                        ctx.lineTo(x2, y2);
+                        ctx.stroke();
+
+                        aliveSparks.push(spark);
+                    }
+                }
+
+                sparks.length = 0;
+                sparks.push(...aliveSparks);
+
+                if (sparks.length > 0) {
+                    animId = requestAnimationFrame(animate);
+                } else {
+                    animId = null;
+                }
+            }
+
+            window.addEventListener('click', (e) => {
+                const now = performance.now();
+                for (let i = 0; i < sparkCount; i++) {
+                    sparks.push({
+                        x: e.clientX,
+                        y: e.clientY,
+                        angle: (2 * Math.PI * i) / sparkCount,
+                        startTime: now
+                    });
+                }
+                if (!animId) {
+                    animId = requestAnimationFrame(animate);
+                }
+            });
+        })();
+
+        // ---- TiltedCard 3D Effect ----
+        (function initTiltedCard() {
+            const card = document.getElementById('tilted-card');
+            if (!card) return;
+            const inner = card.querySelector('.tilted-card-inner');
+            if (!inner) return;
+
+            const rotateAmplitude = 14;
+            const scaleOnHover = 1.05;
+
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const offsetX = e.clientX - rect.left - rect.width / 2;
+                const offsetY = e.clientY - rect.top - rect.height / 2;
+
+                const rotationX = (offsetY / (rect.height / 2)) * -rotateAmplitude;
+                const rotationY = (offsetX / (rect.width / 2)) * rotateAmplitude;
+
+                inner.style.transform = `rotateX(${rotationX.toFixed(2)}deg) rotateY(${rotationY.toFixed(2)}deg) scale(${scaleOnHover})`;
+            });
+
+            card.addEventListener('mouseenter', () => {
+                inner.style.transition = 'transform 0.1s ease-out';
+            });
+
+            card.addEventListener('mouseleave', () => {
+                inner.style.transition = 'transform 0.5s ease-out';
+                inner.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+            });
+        })();
     </script>
 </body>
 
