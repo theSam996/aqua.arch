@@ -11,7 +11,6 @@ app.use(cors({
     origin: true,
     credentials: true
 }));
-app.use(express.static('.')); // Serve static files from root
 
 // Safe Supabase Initialization (prevents top-level crash on Vercel if env vars are missing)
 const supabaseUrl = process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
@@ -52,7 +51,6 @@ app.post('/api/create-order', async (req, res) => {
             return res.status(500).json({ error: "Environment variables missing on server." });
         }
 
-        // Create Razorpay Order
         const options = {
             amount: amount * 100, // Amount in paise
             currency: "INR",
@@ -61,7 +59,6 @@ app.post('/api/create-order', async (req, res) => {
 
         const order = await razorpay.orders.create(options);
 
-        // Insert into Supabase
         const { error } = await supabase
             .from('orders')
             .insert({
@@ -99,7 +96,6 @@ app.post('/api/verify-payment', async (req, res) => {
     try {
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
-        // Verify Signature
         const body = razorpay_order_id + "|" + razorpay_payment_id;
         const expectedSignature = crypto
             .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || 'placeholder_secret')
@@ -107,7 +103,6 @@ app.post('/api/verify-payment', async (req, res) => {
             .digest('hex');
 
         if (expectedSignature === razorpay_signature) {
-            // Update Supabase
             const { error } = await supabase
                 .from('orders')
                 .update({
@@ -124,7 +119,6 @@ app.post('/api/verify-payment', async (req, res) => {
 
             res.json({ status: "success", message: "Payment verified" });
         } else {
-            // Update as Failed
             await supabase
                 .from('orders')
                 .update({ payment_status: 'failed' })
@@ -138,12 +132,5 @@ app.post('/api/verify-payment', async (req, res) => {
         res.status(500).json({ error: "Server Error" });
     }
 });
-
-const PORT = process.env.PORT || 5001;
-if (require.main === module) {
-    app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
-    });
-}
 
 module.exports = app;

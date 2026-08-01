@@ -451,12 +451,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <button onclick="window.location.href='checkout.html'" class="btn btn-primary w-full" style="margin-top: 1.5rem;">Checkout</button>
             `;
-            cartSection.innerHTML = html;
         } else {
             cartSection.innerHTML = '<p style="color: #aaa;">Your cart is empty.</p>';
         }
         lucide.createIcons();
     }
+
+    async function initializeAppResult() {
+        try {
+            const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '5001' ? 'http://localhost:5001' : '';
+            const response = await fetch(`${API_BASE}/api/config`);
+            if (response.ok) {
+                const config = await response.json();
+                if (window.supabase && window.supabase.createClient && config.supabase) {
+                    window.supabase = window.supabase.createClient(config.supabase.url, config.supabase.key);
+                }
+            }
+        } catch (error) {
+            console.warn("Config load notice:", error);
+        }
+        setupAuthListeners();
+    }
+
+    // Start Initialization
+    initializeAppResult();
 
     // --- Checkout Logic (Razorpay) ---
     window.confirmOrder = async (e) => {
@@ -472,45 +490,51 @@ document.addEventListener('DOMContentLoaded', () => {
         const confirmBtn = document.querySelector('button[type="submit"]');
         if (confirmBtn) confirmBtn.innerText = "Processing...";
 
-        // Logic: specific 'Buy Now' product (sessionStorage) vs Cart (localStorage)
-        // Since 'Buy Now' adds to cart, we should check Cart first.
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
         let numericPrice = 0;
         let storedProduct = "Custom Insoles";
 
         if (cart.length > 0) {
-            // Calculate Total from Cart
             numericPrice = cart.reduce((total, item) => {
                 return total + parseInt(item.price.replace(/[^\d]/g, ''));
             }, 0);
             storedProduct = `Order of ${cart.length} items (${cart[0].name}...)`;
         } else {
-            // Fallback for single product buy legacy or empty cart
-            const storedPrice = sessionStorage.getItem('selectedPrice') || "2999";
+            const storedPrice = sessionStorage.getItem('selectedPrice') || "799";
             numericPrice = parseInt(storedPrice.replace(/[^\d]/g, ''));
             storedProduct = sessionStorage.getItem('selectedProduct') || "Custom Insoles";
         }
 
-        const address = document.getElementById('address')?.value || "Not Provided";
+        const fullAddr = [
+            document.getElementById('address')?.value,
+            document.getElementById('city')?.value,
+            document.getElementById('country')?.value,
+            document.getElementById('zip')?.value
+        ].filter(Boolean).join(', ') || "Not Provided";
+
         const shoeSize = document.getElementById('shoe-size')?.value || "Not Provided";
-        const activity = document.getElementById('activity')?.value || "General";
+        const activity = document.getElementById('activity-level')?.value || "General";
+        const phone = document.getElementById('details-phone')?.value || "9999999999";
+        const fullName = document.getElementById('full-name')?.value || user.displayName || "Valued Customer";
 
         const orderData = {
             amount: numericPrice,
             currency: "INR",
             product_name: storedProduct,
             user_id: user.uid,
-            shipping_address: address,
+            shipping_address: fullAddr,
             shoe_size: shoeSize,
             activity_level: activity,
             email: user.email,
-            phone: "9999999999",
-            full_name: user.displayName || "Valued Customer"
+            phone: phone,
+            full_name: fullName
         };
 
         try {
-            // 2. Call Backend to Create Order (Port 5001)
-            const response = await fetch('http://localhost:5001/api/create-order', {
+            const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '5001' ? 'http://localhost:5001' : '';
+
+            // 2. Call Backend to Create Order
+            const response = await fetch(`${API_BASE}/api/create-order`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(orderData)
@@ -528,9 +552,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 "description": `Payment for ${storedProduct}`,
                 "order_id": data.order_id,
                 "handler": async function (response) {
-                    // 4. Verify Payment on Success (Port 5001)
+                    // 4. Verify Payment on Success
                     try {
-                        const verifyRes = await fetch('http://localhost:5001/api/verify-payment', {
+                        const verifyRes = await fetch(`${API_BASE}/api/verify-payment`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({

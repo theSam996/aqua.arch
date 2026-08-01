@@ -145,13 +145,12 @@
     </div>
 
     <script type="module">
-        import { authInitialized } from './script.js';
+        import { auth } from './script.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // Wait for Auth to be ready
-        const auth = await authInitialized;
-
-        lucide.createIcons();
+        if (window.lucide) {
+            lucide.createIcons();
+        }
 
         // State
         let currentStep = 1;
@@ -166,14 +165,17 @@
         const dots = document.querySelectorAll('.step-dot');
         const titleEl = document.getElementById('step-title');
         const emailInput = document.getElementById('details-email');
+        const fullNameInput = document.getElementById('full-name');
 
         // Check Auth
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                emailInput.value = user.email;
+                if (emailInput) emailInput.value = user.email || '';
+                if (fullNameInput && !fullNameInput.value && user.displayName) {
+                    fullNameInput.value = user.displayName;
+                }
             } else {
-                // Not logged in, redirect to Login
-                alert('Please log in to purchase.');
+                alert('Please log in to proceed to checkout.');
                 window.location.href = 'login.html';
             }
         });
@@ -207,13 +209,27 @@
 
         prevBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                changeStep(currentStep - 1);
+                if (currentStep > 1) {
+                    changeStep(currentStep - 1);
+                }
+            });
+        });
+
+        dots.forEach(d => {
+            d.addEventListener('click', () => {
+                const targetStep = parseInt(d.getAttribute('data-step'));
+                if (targetStep < currentStep || validateStep(currentStep)) {
+                    changeStep(targetStep);
+                }
             });
         });
 
         function changeStep(step) {
+            if (step < 1 || step > totalSteps) return;
+
             steps.forEach(s => s.classList.remove('active'));
-            document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
+            const targetStepEl = document.querySelector(`.form-step[data-step="${step}"]`);
+            if (targetStepEl) targetStepEl.classList.add('active');
 
             dots.forEach(d => {
                 const s = parseInt(d.getAttribute('data-step'));
@@ -223,27 +239,40 @@
             });
 
             currentStep = step;
-            titleEl.innerText = titles[step - 1];
+            if (titleEl) titleEl.innerText = titles[step - 1];
         }
 
         function validateStep(step) {
             const currentStepEl = document.querySelector(`.form-step[data-step="${step}"]`);
+            if (!currentStepEl) return true;
             const inputs = currentStepEl.querySelectorAll('input[required], select[required], textarea[required]');
             let valid = true;
+            let firstInvalid = null;
             inputs.forEach(input => {
-                if (!input.value) {
+                if (!input.value || !input.value.trim()) {
                     valid = false;
                     input.style.borderColor = '#EF4444';
+                    if (!firstInvalid) firstInvalid = input;
                 } else {
                     input.style.borderColor = 'rgba(255,255,255,0.1)';
                 }
             });
+
+            if (firstInvalid) {
+                firstInvalid.focus();
+            }
+
             return valid;
         }
 
-        form.addEventListener('submit', (e) => {
-            window.confirmOrder(e);
-        });
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (window.confirmOrder) {
+                    window.confirmOrder(e);
+                }
+            });
+        }
 
     </script>
 </body>
