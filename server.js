@@ -48,8 +48,8 @@ app.post('/api/create-order', async (req, res) => {
     try {
         const { amount, currency, product_name, user_id, shipping_address, shoe_size, activity_level, email, phone, full_name } = req.body;
 
-        if (!process.env.RAZORPAY_KEY_ID || !process.env.SUPABASE_URL) {
-            return res.status(500).json({ error: "Environment variables missing on server." });
+        if (!process.env.RAZORPAY_KEY_ID) {
+            return res.status(500).json({ error: "Razorpay key not configured on server." });
         }
 
         // Create Razorpay Order
@@ -61,24 +61,33 @@ app.post('/api/create-order', async (req, res) => {
 
         const order = await razorpay.orders.create(options);
 
-        // Insert into Supabase
-        const { error } = await supabase
-            .from('orders')
-            .insert({
-                user_id: user_id,
-                product_name: product_name,
-                amount: amount,
-                currency: "INR",
-                razorpay_order_id: order.id,
-                payment_status: 'created',
-                shipping_address: shipping_address,
-                shoe_size: shoe_size,
-                activity_level: activity_level
-            });
+        // Try to insert into Supabase (non-blocking — payment still works if DB fails)
+        if (process.env.SUPABASE_URL && process.env.SUPABASE_URL !== '') {
+            try {
+                const { error } = await supabase
+                    .from('orders')
+                    .insert({
+                        user_id: user_id,
+                        product_name: product_name,
+                        amount: amount,
+                        currency: "INR",
+                        razorpay_order_id: order.id,
+                        payment_status: 'created',
+                        shipping_address: shipping_address,
+                        shoe_size: shoe_size,
+                        activity_level: activity_level,
+                        email: email,
+                        phone: phone,
+                        full_name: full_name
+                    });
 
-        if (error) {
-            console.error("Supabase Insert Error:", error);
-            return res.status(500).json({ error: "Failed to save order" });
+                if (error) {
+                    console.warn("Supabase Insert Warning:", error.message);
+                    // Don't block — Razorpay order was already created
+                }
+            } catch (dbErr) {
+                console.warn("Supabase connection issue:", dbErr.message);
+            }
         }
 
         res.json({
@@ -90,7 +99,7 @@ app.post('/api/create-order', async (req, res) => {
 
     } catch (error) {
         console.error("Create Order Error:", error);
-        res.status(500).json({ error: "Server Error" });
+        res.status(500).json({ error: "Server Error: " + error.message });
     }
 });
 
@@ -102,33 +111,40 @@ app.post('/api/verify-payment', async (req, res) => {
         // Verify Signature
         const body = razorpay_order_id + "|" + razorpay_payment_id;
         const expectedSignature = crypto
-            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || 'placeholder_secret')
+            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
             .update(body.toString())
             .digest('hex');
 
         if (expectedSignature === razorpay_signature) {
-            // Update Supabase
-            const { error } = await supabase
-                .from('orders')
-                .update({
-                    payment_status: 'paid',
-                    razorpay_payment_id: razorpay_payment_id,
-                    razorpay_signature: razorpay_signature
-                })
-                .eq('razorpay_order_id', razorpay_order_id);
-
-            if (error) {
-                console.error("Supabase Update Error:", error);
-                return res.status(500).json({ error: "Payment verified but DB update failed" });
+            // Try to update Supabase (non-blocking)
+            if (process.env.SUPABASE_URL && process.env.SUPABASE_URL !== '') {
+                try {
+                    await supabase
+                        .from('orders')
+                        .update({
+                            payment_status: 'paid',
+                            razorpay_payment_id: razorpay_payment_id,
+                            razorpay_signature: razorpay_signature
+                        })
+                        .eq('razorpay_order_id', razorpay_order_id);
+                } catch (dbErr) {
+                    console.warn("Supabase update issue:", dbErr.message);
+                }
             }
 
             res.json({ status: "success", message: "Payment verified" });
         } else {
-            // Update as Failed
-            await supabase
-                .from('orders')
-                .update({ payment_status: 'failed' })
-                .eq('razorpay_order_id', razorpay_order_id);
+            // Try to update as Failed
+            if (process.env.SUPABASE_URL && process.env.SUPABASE_URL !== '') {
+                try {
+                    await supabase
+                        .from('orders')
+                        .update({ payment_status: 'failed' })
+                        .eq('razorpay_order_id', razorpay_order_id);
+                } catch (dbErr) {
+                    console.warn("Supabase update issue:", dbErr.message);
+                }
+            }
 
             res.status(400).json({ status: "failure", message: "Invalid Signature" });
         }
@@ -137,6 +153,54 @@ app.post('/api/verify-payment', async (req, res) => {
         console.error("Verify Error:", error);
         res.status(500).json({ error: "Server Error" });
     }
+});
+
+// 3. Get User Orders API
+app.get('/api/orders/:userId', async (req, res) => {
+    try {
+        if (!process.env.SUPABASE_URL || process.env.SUPABASE_URL === '') {
+            return res.json({ orders: [] });
+        }
+
+        const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('user_id', req.params.userId)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.warn("Supabase fetch orders warning:", error.message);
+            return res.json({ orders: [] });
+        }
+
+        res.json({ orders: data || [] });
+    } catch (error) {
+        console.error("Fetch Orders Error:", error);
+        res.json({ orders: [] });
+    }
+});
+
+// 4. Health Check API
+app.get('/api/health', async (req, res) => {
+    const status = {
+        server: 'ok',
+        razorpay: !!process.env.RAZORPAY_KEY_ID,
+        supabase: !!process.env.SUPABASE_URL && process.env.SUPABASE_URL !== ''
+    };
+
+    // Test Supabase connection
+    if (status.supabase) {
+        try {
+            const { error } = await supabase.from('orders').select('count', { count: 'exact', head: true });
+            status.supabase_connected = !error;
+            if (error) status.supabase_error = error.message;
+        } catch (e) {
+            status.supabase_connected = false;
+            status.supabase_error = e.message;
+        }
+    }
+
+    res.json(status);
 });
 
 const PORT = process.env.PORT || 5001;
