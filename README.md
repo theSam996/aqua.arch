@@ -1,43 +1,65 @@
-# AquaSole - Sustainable Insoles
-
-AquaSole is a web platform for 3D-printed sustainable insoles made from marine algae. This project allows users to explore products, perform 3D foot scans using their webcam, and manage their orders.
-
-## Features
-
--   **Home Page**: Product showcase, features, and detailed "How It Works" section.
--   **3D Foot Scan**: Browser-based webcam integration to record foot scans for custom insole fitting.
--   **Dashboard**: Manage your 3D scans and view your cart.
--   **Shopping Cart**: Functional cart with local storage persistence.
--   **Orders**: Order tracking visualization.
--   **Authentication**: Integrated with Firebase (Google & Email Login).
-
-## Tech Stack
-
--   **Frontend**: Vanilla HTML, CSS, JavaScript (No framework required).
--   **Styling**: Custom CSS with glassmorphism design and responsive utilities.
--   **Icons**: Lucide Icons.
--   **Authentication**: Firebase Auth (CDN).
-
-## How to Run
-
-1.  **Clone the repository**:
-    ```bash
-    git clone https://github.com/your-username/aquasole.git
-    ```
-2.  **Open the project**:
-    -   Simply open `index.html` in your browser.
-    -   **Recommendation**: Use a local development server (like "Live Server" in VS Code) for the 3D Scan camera features to work correctly (camera access usually requires `localhost` or `https`).
+# AquaSole 🌊👟
+**Sustainable Insoles from Ocean Algae**
 
 ## Project Structure
 
--   `index.html` - Landing page.
--   `foot_scan.html` - 3D scanning interface.
--   `dashboard.html` - User dashboard (scans, cart).
--   `orders.html` - Order history and tracking.
--   `checkout.html` - Multi-step checkout form.
--   `script.js` - Application logic (Firebase auth, UI interactions, Camera).
--   `style.css` - Global styles and responsiveness.
+```
+aqua-sole/
+│
+├── frontend/                  # Static frontend (HTML/CSS/JS)
+│   ├── assets/                # Images and media
+│   ├── index.html             # Landing page
+│   ├── login.html             # Login page
+│   ├── signup.html            # Signup page
+│   ├── dashboard.html         # User dashboard & cart
+│   ├── checkout.html          # Multi-step checkout
+│   ├── orders.html            # Order history
+│   ├── foot_scan.html         # 3D foot scanning
+│   ├── script.js              # Main application logic
+│   ├── style.css              # Global styles
+│   ├── landing.css            # Landing page styles
+│   └── vercel.json            # Vercel deployment config
+│
+├── backend/                   # Express.js API server
+│   ├── server.js              # Main server (Razorpay + Supabase)
+│   ├── api/index.js           # Vercel serverless entrypoint
+│   ├── package.json           # Node.js dependencies
+│   ├── .env                   # Environment variables (git-ignored)
+│   ├── .env.example           # Template for environment variables
+│   └── supabase_setup.sql     # Database schema setup
+│
+├── README.md
+└── .gitignore
+```
 
-## License
+## Getting Started
 
-MIT License - Copyright (c) 2026 AquaSole
+### 1. Install Backend Dependencies
+```bash
+cd backend
+npm install
+```
+
+### 2. Configure Environment Variables
+```bash
+cp .env.example .env
+# Edit .env with your Razorpay, Firebase, and Supabase credentials
+```
+
+### 3. Setup Supabase Database
+Run the SQL from `backend/supabase_setup.sql` in your Supabase SQL Editor.
+
+### 4. Start the Development Server
+```bash
+cd backend
+npm run dev
+```
+
+Open **http://localhost:5001** in your browser.
+
+## Tech Stack
+- **Frontend**: Vanilla HTML/CSS/JS, Lucide Icons, Firebase Auth
+- **Backend**: Node.js, Express.js
+- **Payments**: Razorpay
+- **Database**: Supabase (PostgreSQL)
+- **Deployment**: Vercel

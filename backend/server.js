@@ -3,6 +3,7 @@ const express = require('express');
 const Razorpay = require('razorpay');
 const cors = require('cors');
 const crypto = require('crypto');
+const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
@@ -11,7 +12,7 @@ app.use(cors({
     origin: true,
     credentials: true
 }));
-app.use(express.static('.')); // Serve static files from root
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Safe Supabase Initialization (prevents top-level crash on Vercel if env vars are missing)
 const supabaseUrl = process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
@@ -204,10 +205,9 @@ app.get('/api/health', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5001;
-if (require.main === module) {
-    app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
-    });
-}
+
+app.listen(PORT, () => {
+    console.log(`Server running on ${PORT}`);
+});
 
 module.exports = app;
