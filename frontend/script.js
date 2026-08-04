@@ -20,7 +20,7 @@ export const auth = getAuth(app);
 
 async function initializeAppResult() {
     try {
-        const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? `http://localhost:${window.location.port || 5001}` : '';
+        const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? `http://localhost:${window.location.port || 5001}` : 'https://aqua-sole-backend.onrender.com';
         const response = await fetch(`${API_BASE}/api/config`);
         if (response.ok) {
             const config = await response.json();
@@ -535,7 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '5001' ? 'http://localhost:5001' : '';
+            const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '5001' ? 'http://localhost:5001' : 'https://aqua-sole-backend.onrender.com';
 
             // 2. Call Backend to Create Order
             const response = await fetch(`${API_BASE}/api/create-order`, {
