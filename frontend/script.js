@@ -663,13 +663,42 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!user) return;
 
         try {
-            // Fetch orders from backend API instead of direct Supabase
-            const response = await fetch(`${API_BASE}/api/orders/${user.uid}`);
-            if (!response.ok) throw new Error('Failed to fetch orders');
-            const result = await response.json();
-            const orders = result.orders;
+            let orders = null;
 
-            if (!orders || orders.length === 0) {
+            // Strategy 1: Direct Supabase client query (fastest, independent of backend cold start)
+            const client = window.getSupabase();
+            if (client && typeof client.from === 'function') {
+                try {
+                    const { data, error } = await client
+                        .from('orders')
+                        .select('*')
+                        .eq('user_id', user.uid)
+                        .order('created_at', { ascending: false });
+
+                    if (!error && data) {
+                        orders = data;
+                    } else if (error) {
+                        console.warn("Direct Supabase fetch orders warning:", error.message);
+                    }
+                } catch (sErr) {
+                    console.warn("Direct Supabase fetch orders notice:", sErr);
+                }
+            }
+
+            // Strategy 2: Backend API fallback (if Strategy 1 returned null)
+            if (orders === null) {
+                const response = await fetch(`${API_BASE}/api/orders/${user.uid}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    orders = result.orders || [];
+                }
+            }
+
+            if (orders === null) {
+                throw new Error("Unable to connect to order service");
+            }
+
+            if (orders.length === 0) {
                 ordersContainer.innerHTML = `
                     <h1 class="section-title mb-8">Your <span class="accent-text">Orders</span></h1>
                     <p class="text-center" style="color: #aaa;">You haven't placed any orders yet.</p>
@@ -683,7 +712,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let html = `<h1 class="section-title mb-8">Your <span class="accent-text">Orders</span></h1><div class="flex flex-col gap-6">`;
 
             orders.forEach((order, index) => {
-                const date = new Date(order.created_at).toLocaleDateString();
+                const date = new Date(order.created_at || Date.now()).toLocaleDateString();
                 const statusColor = order.payment_status === 'paid' ? '#4ADE80' :
                     order.payment_status === 'failed' ? '#EF4444' : '#FBBF24';
 
@@ -694,12 +723,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="order-card" style="animation-delay: ${index * 100}ms">
                         <div class="order-card-header">
                             <div>
-                                <h3 class="order-title">${order.product_name}</h3>
+                                <h3 class="order-title">${order.product_name || 'Custom Insole'}</h3>
                                 <p class="order-date">Placed on ${date}</p>
                             </div>
                              <div style="display:flex; align-items:center; gap:0.5rem; color: ${statusColor}; font-weight:500;">
                                 <i data-lucide="${statusIcon}" width="18"></i>
-                                <span style="text-transform: capitalize;">${order.payment_status}</span>
+                                <span style="text-transform: capitalize;">${order.payment_status || 'created'}</span>
                             </div>
                         </div>
                         
@@ -719,11 +748,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             html += `</div>`;
             ordersContainer.innerHTML = html;
-            lucide.createIcons();
+            if (window.lucide && window.lucide.createIcons) lucide.createIcons();
 
         } catch (error) {
             console.error("Error fetching orders:", error);
-            ordersContainer.innerHTML += '<p style="color: red; text-align: center;">Failed to load orders.</p>';
+            ordersContainer.innerHTML = `
+                <h1 class="section-title mb-8">Your <span class="accent-text">Orders</span></h1>
+                <p style="color: #EF4444; text-align: center;">Failed to load orders.<br><small>${error.message}</small></p>
+            `;
         }
     };
 });
