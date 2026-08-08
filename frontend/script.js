@@ -23,15 +23,54 @@ const API_BASE = (window.location.hostname === 'localhost' || window.location.ho
     ? 'http://localhost:5001'
     : 'https://aqua-sole-backend.onrender.com';
 
+const DEFAULT_SUPABASE_URL = "https://yktdpfvhhhbffbdjpyry.supabase.co";
+const DEFAULT_SUPABASE_ANON_KEY = "sb_publishable_iIPisVnmBYo_dDpf6IlTGQ_Cqwhed_F";
+
+let _supabaseInstance = null;
+
+window.initSupabase = function(url, key) {
+    const sUrl = url || DEFAULT_SUPABASE_URL;
+    const sKey = key || DEFAULT_SUPABASE_ANON_KEY;
+
+    // Grab createClient function before replacing window.supabase
+    const createClientFn = window.supabase?.createClient || (typeof supabase !== 'undefined' && supabase?.createClient);
+
+    if (createClientFn && sUrl && sKey) {
+        try {
+            _supabaseInstance = createClientFn(sUrl, sKey);
+            window.supabaseClient = _supabaseInstance;
+            window.supabase = _supabaseInstance;
+            console.log("Supabase client initialized successfully");
+        } catch (e) {
+            console.warn("Failed to create Supabase client:", e);
+        }
+    }
+};
+
+window.getSupabase = function() {
+    if (!_supabaseInstance) {
+        if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
+            _supabaseInstance = window.supabaseClient;
+        } else if (window.supabase && typeof window.supabase.from === 'function') {
+            _supabaseInstance = window.supabase;
+        } else {
+            window.initSupabase();
+        }
+    }
+    return _supabaseInstance;
+};
+
+// Synchronously initialize Supabase immediately when script loads
+window.initSupabase();
+
 async function initializeAppResult() {
+    window.initSupabase();
     try {
         const response = await fetch(`${API_BASE}/api/config`);
         if (response.ok) {
             const config = await response.json();
-            // Initialize Supabase if URL is provided
-            if (window.supabase && window.supabase.createClient && config.supabase && config.supabase.url) {
-                window.supabase = window.supabase.createClient(config.supabase.url, config.supabase.key);
-                console.log("Supabase initialized");
+            if (config.supabase && config.supabase.url && config.supabase.key) {
+                window.initSupabase(config.supabase.url, config.supabase.key);
             }
         }
     } catch (error) {
@@ -251,9 +290,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             console.log(`Attempting to delete scan ${id} at path ${videoPath}`);
+            const client = window.getSupabase();
+            if (!client || typeof client.from !== 'function') {
+                throw new Error("Supabase database client is not ready.");
+            }
 
             // A. Delete from Storage
-            const { error: storageError } = await window.supabase
+            const { error: storageError } = await client
                 .storage
                 .from('foot_scans')
                 .remove([videoPath]);
@@ -263,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // B. Delete from Database
-            const { data, error: dbError } = await window.supabase
+            const { data, error: dbError } = await client
                 .from('scans')
                 .delete()
                 .eq('id', id)
@@ -274,7 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!data || data.length === 0) {
                 console.warn("No rows deleted. Check RLS policies.");
                 alert("Could not delete scan. RLS Policy interaction.");
-                // return; // Soft fail, refresh anyway
             }
 
             alert("Scan deleted successfully.");
@@ -292,20 +334,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!user) return;
 
         try {
+            const client = window.getSupabase();
+            if (!client || typeof client.from !== 'function') {
+                throw new Error("Supabase database client is not ready.");
+            }
+
             const fileName = `scan_${user.uid}_${Date.now()}.webm`;
-            const { data, error } = await window.supabase.storage
+            const { data, error } = await client.storage
                 .from('foot_scans')
                 .upload(fileName, file);
 
             if (error) throw error;
 
             // Get Public URL
-            const { data: { publicUrl } } = window.supabase.storage
+            const { data: { publicUrl } } = client.storage
                 .from('foot_scans')
                 .getPublicUrl(fileName);
 
             // Save to DB (Schema: id, user_id, video_path, created_at)
-            const { error: dbError } = await window.supabase
+            const { error: dbError } = await client
                 .from('scans')
                 .insert({
                     user_id: user.uid,
@@ -331,8 +378,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!scansContainer) return;
 
         try {
-            if (!window.supabase) {
-                throw new Error("Supabase client not initialized");
+            const client = window.getSupabase();
+            if (!client || typeof client.from !== 'function') {
+                throw new Error("Supabase client is loading or not initialized.");
             }
 
             const user = auth.currentUser;
@@ -341,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const { data, error } = await window.supabase
+            const { data, error } = await client
                 .from('scans')
                 .select('*')
                 .eq('user_id', user.uid)
@@ -361,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const fileName = scan.video_path.split('_').pop();
 
                     // Generate Signed URL dynamically (valid for 1 hour)
-                    const { data: signedUrlData, error: signError } = await window.supabase.storage
+                    const { data: signedUrlData, error: signError } = await client.storage
                         .from('foot_scans')
                         .createSignedUrl(scan.video_path, 3600);
 
@@ -380,22 +428,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                      <i data-lucide="trash-2" width="18"></i>
                                 </button>
                             </div>
-
-                            <video controls style="width:100%; border-radius:0.5rem; margin-bottom:1rem; background:black;">
-                                <source src="${videoUrl}" type="video/webm">
-                                <source src="${videoUrl}" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
+                            ${videoUrl ? `<video src="${videoUrl}" controls style="width:100%; max-height:200px; border-radius:0.5rem; background:#000;"></video>` : ''}
                         </div>
                     `;
                 }
 
                 scansContainer.innerHTML = html;
-                lucide.createIcons();
+                if (window.lucide && window.lucide.createIcons) lucide.createIcons();
             }
         } catch (error) {
-            console.error("Error in fetchScans:", error);
-            scansContainer.innerHTML = '<p style="color:red">Failed to load scans. ' + error.message + '</p>';
+            console.error("Failed to load scans:", error);
+            scansContainer.innerHTML = `<p style="color: #EF4444;">Failed to load scans.<br><small>${error.message}</small></p>`;
         }
     };
 
