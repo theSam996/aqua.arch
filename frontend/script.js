@@ -82,25 +82,76 @@ function setupAuthListeners() {
                 window.location.href = 'login.html';
             }
         }
+        if (window.updateCartUI) window.updateCartUI();
     });
 }
 
+// --- Centralized Cart State & UI Sync ---
+window.updateCartUI = () => {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+    // 1. Update all cart count badges across the page
+    const cartBadges = document.querySelectorAll('.cart-count');
+    cartBadges.forEach(el => {
+        el.textContent = cart.length;
+    });
+
+    // 2. Render cart items container if present on current page (e.g. dashboard.html)
+    const cartSection = document.getElementById('cart-container');
+    if (cartSection) {
+        if (cart.length > 0) {
+            let html = '<div class="flex flex-col gap-4">';
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                const priceNum = parseInt(String(item.price || '0').replace(/[^\d]/g, '')) || 0;
+                total += priceNum;
+
+                html += `
+                    <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="margin:0; font-size: 1rem; color: #fff;">${item.name}</h4>
+                            <p style="margin:0; font-size: 0.85rem; color: #00c88c; font-weight: 600;">${item.price}</p>
+                        </div>
+                        <button onclick="removeFromCart(${index})" title="Remove item" style="background:none; border:none; color: #EF4444; cursor: pointer; padding: 0.25rem;">
+                            <i data-lucide="trash-2" width="18"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            html += `</div>
+                <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: bold; font-size: 1.1rem; color: #fff;">Total:</span>
+                    <span style="font-weight: bold; color: #00c88c; font-size: 1.2rem;">₹${total.toLocaleString('en-IN')}</span>
+                </div>
+                <button onclick="window.location.href='checkout.html'" class="btn btn-primary w-full" style="margin-top: 1.5rem; cursor: pointer;">Proceed to Checkout</button>
+            `;
+            cartSection.innerHTML = html;
+        } else {
+            cartSection.innerHTML = '<p style="color: #aaa;">Your cart is empty.</p>';
+        }
+        if (window.lucide && window.lucide.createIcons) {
+            window.lucide.createIcons();
+        }
+    }
+};
+
 // Global function for Buy Now
 window.buyProduct = (name, price) => {
-    // Check if user is logged in
-    const user = auth.currentUser;
     sessionStorage.setItem('selectedProduct', name);
     sessionStorage.setItem('selectedPrice', price);
 
-    // Add to cart in localStorage
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     cart.push({ name, price });
     localStorage.setItem('cart', JSON.stringify(cart));
+    if (window.updateCartUI) window.updateCartUI();
 
+    const user = auth ? auth.currentUser : null;
     if (user) {
-        window.location.href = 'dashboard.html'; // Redirect to dashboard to see cart
+        window.location.href = 'checkout.html';
     } else {
-        alert("Please log in to purchase.");
+        alert("Please log in to proceed to checkout.");
         window.location.href = 'login.html';
     }
 };
@@ -110,18 +161,26 @@ window.addToCart = (name, price) => {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     cart.push({ name, price });
     localStorage.setItem('cart', JSON.stringify(cart));
-    alert(`${name} added to cart!`);
+    if (window.updateCartUI) window.updateCartUI();
+
+    alert(`"${name}" (${price}) has been added to your cart!`);
 };
 
+// Global function for Remove from Cart
 window.removeFromCart = (index) => {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    cart.splice(index, 1);
-    localStorage.setItem('cart', JSON.stringify(cart));
-    location.reload();
-}
+    if (index >= 0 && index < cart.length) {
+        cart.splice(index, 1);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        if (window.updateCartUI) window.updateCartUI();
+    }
+};
 
 // UI Logic
 document.addEventListener('DOMContentLoaded', () => {
+    // Initial Cart UI sync
+    if (window.updateCartUI) window.updateCartUI();
+
     // Scroll Animation
     const reveals = document.querySelectorAll('.reveal');
 
@@ -421,44 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Dashboard Page Logic ---
-    const scansSection = document.getElementById('scans-container');
-    const cartSection = document.getElementById('cart-container');
-
-    if (cartSection) {
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        if (cart.length > 0) {
-            let html = '<div class="flex flex-col gap-4">';
-            let total = 0;
-
-            cart.forEach((item, index) => {
-                const priceNum = parseInt(item.price.replace(/[^\d]/g, ''));
-                total += priceNum;
-
-                html += `
-                    <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h4 style="margin:0; font-size: 1rem;">${item.name}</h4>
-                            <p style="margin:0; font-size: 0.85rem; color: #aaa;">${item.price}</p>
-                        </div>
-                        <button onclick="removeFromCart(${index})" style="background:none; border:none; color: #EF4444; cursor: pointer;">
-                            <i data-lucide="trash-2" width="18"></i>
-                        </button>
-                    </div>
-                `;
-            });
-
-            html += `</div>
-                <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-weight: bold; font-size: 1.1rem;">Total:</span>
-                    <span style="font-weight: bold; color: var(--accent-primary); font-size: 1.1rem;">₹${total}</span>
-                </div>
-                <button onclick="window.location.href='checkout.html'" class="btn btn-primary w-full" style="margin-top: 1.5rem;">Checkout</button>
-            `;
-        } else {
-            cartSection.innerHTML = '<p style="color: #aaa;">Your cart is empty.</p>';
-        }
-        lucide.createIcons();
-    }
+    window.updateCartUI();
 
     // (initializeAppResult already called at top level)
 
