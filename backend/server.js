@@ -8,16 +8,16 @@ const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.use(express.json());
-// Universal CORS Middleware for all frontend origins
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-    next();
-});
+app.use(cors({
+    origin: [
+        'http://localhost:5001',
+        'http://localhost:5500',
+        'http://127.0.0.1:5500',
+        'https://aqua-arch.vercel.app',
+        /\.vercel\.app$/
+    ],
+    credentials: true
+}));
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Safe Supabase Initialization (prevents top-level crash on Vercel if env vars are missing)
