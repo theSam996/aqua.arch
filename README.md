@@ -55,7 +55,7 @@ cd backend
 npm run dev
 ```
 
-Open **http://localhost:5001** in your browser.
+Open **https://aqua-arch.vercel.app** in your browser.
 
 ## Tech Stack
 - **Frontend**: Vanilla HTML/CSS/JS, Lucide Icons, Firebase Auth
