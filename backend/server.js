@@ -8,14 +8,18 @@ const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.use(express.json());
-// CORS Configuration - Allows Vercel frontend, localhost, and custom domains
-app.use(cors({
-    origin: (origin, callback) => callback(null, true),
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
-}));
-app.options('*', cors());
+// Universal CORS Middleware for Vercel, localhost, and external clients
+app.use((req, res, next) => {
+    const origin = req.headers.origin || '*';
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+    next();
+});
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Safe Supabase Initialization (prevents top-level crash on Vercel if env vars are missing)
