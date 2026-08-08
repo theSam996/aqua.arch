@@ -528,6 +528,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // (initializeAppResult already called at top level)
 
     // --- Checkout Logic (Razorpay) ---
+    // Background warm-up ping to wake Render server if on checkout page
+    if (window.location.pathname.includes('checkout')) {
+        fetch(`${API_BASE}/api/health`).catch(err => console.warn("Backend warmup ping notice:", err));
+    }
+
+    const fetchWithRetry = async (url, options, retries = 3, delay = 2000) => {
+        for (let i = 0; i < retries; i++) {
+            try {
+                const res = await fetch(url, options);
+                return res;
+            } catch (err) {
+                console.warn(`Attempt ${i + 1} failed for ${url}. Retrying in ${delay}ms...`, err);
+                if (i === retries - 1) throw err;
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+    };
+
     window.confirmOrder = async (e) => {
         if (e) e.preventDefault();
 
@@ -539,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const confirmBtn = document.querySelector('button[type="submit"]');
-        if (confirmBtn) confirmBtn.innerText = "Processing...";
+        if (confirmBtn) confirmBtn.innerText = "Processing (Waking Server)...";
 
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
         let numericPrice = 0;
@@ -582,10 +600,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            // Uses global API_BASE defined at top of file
-
-            // 2. Call Backend to Create Order
-            const response = await fetch(`${API_BASE}/api/create-order`, {
+            // 2. Call Backend to Create Order (with automatic retry for Render cold starts)
+            const response = await fetchWithRetry(`${API_BASE}/api/create-order`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(orderData)
@@ -605,7 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 "handler": async function (response) {
                     // 4. Verify Payment on Success
                     try {
-                        const verifyRes = await fetch(`${API_BASE}/api/verify-payment`, {
+                        const verifyRes = await fetchWithRetry(`${API_BASE}/api/verify-payment`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
